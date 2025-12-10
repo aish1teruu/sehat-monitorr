@@ -1,0 +1,23 @@
+{
+    "name": "setor-monorepo",
+    "version": "1.0.0",
+    "description": "SETOR Health Reporting System (Monorepo for Vercel)",
+    "scripts": {
+        "build": "cd FrontEnd && npm install && npm run build"
+    },
+    "dependencies": {
+        "axios": "^1.13.2",
+        "cors": "^2.8.5",
+        "dotenv": "^17.2.3",
+        "express": "^5.1.0",
+        "joi": "^18.0.2",
+        "multer": "^2.0.2",
+        "node-fetch": "^2.7.0",
+        "pg": "^8.16.3",
+        "sharp": "^0.34.5",
+        "uuid": "^13.0.0"
+    },
+    "engines": {
+        "node": ">=18.x"
+    }
+}
