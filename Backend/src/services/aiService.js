@@ -26,12 +26,12 @@ class AIService {
         this.listModels();
 
         // Define the model with JSON configuration
-        // Switching to 'gemini-1.5-pro' to see if 'flash' is blocked in Vercel region
+        // Switching back to 'gemini-1.5-flash' as it is the correct V1Beta model
         this.model = this.genAI.getGenerativeModel({
-            model: "gemini-1.5-pro",
+            model: "gemini-1.5-flash",
         });
 
-        console.log("DEBUG: Google AI SDK Initialized with gemini-1.5-pro");
+        console.log("DEBUG: Google AI SDK Initialized with gemini-1.5-flash");
     }
 
     async listModels() {
@@ -86,8 +86,13 @@ class AIService {
 
         } catch (err) {
             console.error("Google SDK Error:", err.message);
+
+            // KEY DEBUG: Reveal the length AND prefix (safe) to prove mismatch
+            const keyLength = this.apiKey ? this.apiKey.length : 0;
+            const keyPrefix = this.apiKey ? this.apiKey.substring(0, 5) + "..." : "undefined";
+
             // Throw specific error for Controller to catch
-            throw new Error(`AI Service Failed: ${err.message}`);
+            throw new Error(`AI Service Failed (${err.message}). Key Used: ${keyPrefix} (Length: ${keyLength})`);
         }
     }
 }
