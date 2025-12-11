@@ -16,7 +16,9 @@ const makeReportController = ({ reportService }) => {
 
             // Tangani error API Key (403)
             if (statusCode === 403 || errorMessage.includes('API Key')) {
-                return res.status(403).json({ error: 'Akses Ditolak: Kunci API Gemini tidak valid atau tidak memiliki izin.' });
+                // DEBUG: Show which key is being used (masked)
+                const usedKey = process.env.AI_API_KEY ? `${process.env.AI_API_KEY.substring(0, 8)}...` : 'undefined';
+                return res.status(403).json({ error: `Akses Ditolak. Key yang digunakan server: ${usedKey}. Pastikan Key ini benar.` });
             }
         } else if (errorMessage.includes('ENOENT') || errorMessage.includes('no such file')) {
             statusCode = 400;
