@@ -6,7 +6,9 @@
         "build": "cd FrontEnd && npm install && CI=false npm run build && cd .. && rm -rf build && mv FrontEnd/build build"
     },
     "dependencies": {
-        "@google/generative-ai": "^0.24.1",
+        "ai": "^4.0.18",
+        "@ai-sdk/openai": "^1.0.11",
+        "zod": "^3.24.1",
         "axios": "^1.13.2",
         "cors": "^2.8.5",
         "dotenv": "^17.2.3",
