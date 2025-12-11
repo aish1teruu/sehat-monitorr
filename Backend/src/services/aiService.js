@@ -1,10 +1,21 @@
-const axios = require('axios');
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 class AIService {
-    constructor({ apiUrl, apiKey }) {
-        this.apiUrl = apiUrl;
+    constructor({ apiKey }) {
         this.apiKey = apiKey;
-        console.log("DEBUG: AIService initialized with URL:", this.apiUrl);
+        // Initialize the Official Google SDK
+        // This resolves the 404/403 errors by handling the authentication automatically
+        this.genAI = new GoogleGenerativeAI(this.apiKey);
+        
+        // Define the model with JSON configuration
+        this.model = this.genAI.getGenerativeModel({ 
+            model: "gemini-1.5-flash",
+            generationConfig: {
+                responseMimeType: "application/json"
+            }
+        });
+        
+        console.log("DEBUG: Google AI SDK Initialized with gemini-1.5-flash");
     }
 
     /**
@@ -13,86 +24,42 @@ class AIService {
      * @returns {Promise<number|null>} Skor keparahan 0-100, atau null jika gagal.
      */
     async scoreWound(base64ImageData) {
-        // PERBAIKAN: Hardcode URL untuk mengatasi 404 (Salah URL di Vercel)
-        // Menggunakan model gemini-1.5-flash yang stabil
-        const validUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
-        // Trim key to remove accidental whitespace/newlines
-        const cleanKey = this.apiKey ? this.apiKey.trim() : '';
-        const url = `${validUrl}?key=${cleanKey}`;
-        console.log("DEBUG: Using URL:", validUrl);
-
-        const requestSchema = {
-            type: "object",
-            properties: {
-                severity_score: {
-                    type: "integer",
-                    description: "Nilai skalar tunggal yang mewakili tingkat keparahan luka dari 0 (paling ringan) hingga 100 (paling parah)."
-                }
-            },
-            required: ["severity_score"]
-        };
-
-        const requestBody = {
-            contents: [
-                {
-                    parts: [
-                        { text: "Berdasarkan gambar luka, berikan penilaian keparahan dalam skala 0 hingga 100. Berikan jawaban HANYA dalam format JSON berikut." },
-                        // PENTING: Menggunakan 'inlineData' (CamelCase)
-                        {
-                            inlineData: {
-                                mimeType: base64ImageData.mimeType,
-                                data: base64ImageData.data
-                            }
-                        }
-                    ]
-                }
-            ],
-            generationConfig: {
-                // Meminta output berupa JSON
-                responseMimeType: "application/json",
-                responseSchema: requestSchema
-            }
-        };
-
-        console.log("DEBUG: base64ImageData keys:", Object.keys(base64ImageData));
-        console.log("DEBUG: mimeType:", base64ImageData.mimeType);
-        console.log("DEBUG: data length:", base64ImageData.data ? base64ImageData.data.length : 'undefined');
-
         try {
-            console.log("DEBUG: Sending request to Gemini URL:", url);
-            const res = await axios.post(url, requestBody, {
-                headers: { "Content-Type": "application/json" }
-            });
+            console.log("DEBUG: Preparing request with Google SDK...");
 
-            if (!res.data.candidates || res.data.candidates.length === 0) {
-                console.error("Gemini API error: No candidates found in response.");
-                // Melempar error untuk ditangani oleh controller
-                throw new Error("API Gemini tidak mengembalikan kandidat respons.");
-            }
+            // Prompt for JSON output
+            const prompt = "Berdasarkan gambar luka, berikan penilaian keparahan dalam skala 0 hingga 100. Berikan jawaban HANYA dalam format JSON dengan key 'severity_score'. Contoh: { \"severity_score\": 75 }";
 
-            // Parsing Hasil JSON yang Terstruktur
-            const textResponse = res.data.candidates[0].content.parts[0].text;
-            const jsonResult = JSON.parse(textResponse);
-            const score = jsonResult.severity_score;
+            // Prepare the image part
+            const imagePart = {
+                inlineData: {
+                    data: base64ImageData.data,
+                    mimeType: base64ImageData.mimeType
+                }
+            };
 
-            if (typeof score === 'number' && score >= 0 && score <= 100) {
-                return score;
+            // Call the API
+            const result = await this.model.generateContent([prompt, imagePart]);
+            const response = await result.response;
+            const text = response.text();
+            
+            console.log("DEBUG: Raw AI Response:", text);
+
+            // Clean up code blocks if present ( ```json ... ``` )
+            // The SDK usually handles this with responseMimeType, but safety first
+            const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+            const jsonResult = JSON.parse(cleanText);
+
+            if (jsonResult.severity_score !== undefined) {
+                 return jsonResult.severity_score;
             } else {
-                console.error("Gemini API error: Invalid score format returned.");
-                // Melempar error jika format output Gemini salah
-                throw new Error("Skor yang dikembalikan AI tidak valid atau di luar jangkauan.");
+                 throw new Error("Format JSON tidak sesuai: " + text);
             }
 
         } catch (err) {
-            // Log error yang detail ke backend console
-            console.error("Gemini API error (Multimodal Failure):", err.response?.status, err.response?.data || err.message);
-
-            // PERBAIKAN: Lempar error (termasuk status HTTP) agar controller tahu status apa yang harus dikirim ke frontend
-            if (err.response?.status) {
-                // Ensure "Status" is capitalized to match controller regex
-                throw new Error(`Gemini API returned Status ${err.response.status}. Check API Key or image format.`);
-            }
-            throw err; // Lempar error jaringan atau parsing lainnya
+            console.error("Google SDK Error:", err.message);
+            // Throw specific error for Controller to catch
+            throw new Error(`AI Service Failed: ${err.message}`);
         }
     }
 }
