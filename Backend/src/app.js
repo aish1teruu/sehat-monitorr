@@ -33,7 +33,8 @@ function createApp() {
 
   const controller = makeReportController({ reportService });
 
-  app.use('/reports', reportRoutesFactory(controller));
+  // Mount at /api/reports to match Vercel rewrite structure
+  app.use('/api/reports', reportRoutesFactory(controller));
 
   // error handler
   app.use((err, req, res, next) => {
