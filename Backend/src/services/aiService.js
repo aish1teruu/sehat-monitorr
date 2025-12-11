@@ -26,12 +26,15 @@ class AIService {
         this.listModels();
 
         // Define the model with JSON configuration
-        // Switching back to 'gemini-1.5-flash' as it is the correct V1Beta model
+        // Switching back to 'gemini-1.5-flash'
+        // FIX: Force 'apiVersion: v1' because new AI Studio keys don't support v1beta
         this.model = this.genAI.getGenerativeModel({
             model: "gemini-1.5-flash",
+        }, {
+            apiVersion: "v1"
         });
 
-        console.log("DEBUG: Google AI SDK Initialized with gemini-1.5-flash");
+        console.log("DEBUG: Google AI SDK Initialized with gemini-1.5-flash (v1)");
     }
 
     async listModels() {
