@@ -1,6 +1,17 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 class AIService {
+    async listModels() {
+        try {
+            console.log("DEBUG: Listing available models...");
+            const modelResponse = await this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+            // Note: SDK doesn't have direct listModels on instance, usually strictly via API/Manager
+            // We'll skip complex listing for now and just focus on model switch safety.
+        } catch (e) {
+            console.error("DEBUG: List Models failed", e.message);
+        }
+    }
+
     constructor({ apiKey }) {
         this.apiKey = apiKey;
         // Trim potentially hidden whitespace from environment variables (Critical Fix for Vercel 404)
@@ -10,15 +21,29 @@ class AIService {
         // This resolves the 404/403 errors by handling the authentication automatically
         this.genAI = new GoogleGenerativeAI(cleanKey);
 
+        // DEBUG: List available models to see what is allowed
+        // This will print to Vercel logs if headers/auth fails
+        this.listModels();
+
         // Define the model with JSON configuration
+        // Switching to 'gemini-1.5-pro' to see if 'flash' is blocked in Vercel region
         this.model = this.genAI.getGenerativeModel({
-            model: "gemini-1.5-flash",
-            generationConfig: {
-                responseMimeType: "application/json"
-            }
+            model: "gemini-1.5-pro",
         });
 
-        console.log("DEBUG: Google AI SDK Initialized with gemini-1.5-flash");
+        console.log("DEBUG: Google AI SDK Initialized with gemini-1.5-pro");
+    }
+
+    async listModels() {
+        try {
+            const models = await this.genAI.listModels();
+            console.log("DEBUG: Available Gemini Models:");
+            for (const model of models) {
+                console.log(`- ${model.name}`);
+            }
+        } catch (error) {
+            console.error("DEBUG: Error listing models:", error.message);
+        }
     }
 
     /**
