@@ -25,34 +25,37 @@ function createApp() {
   db.initializeDatabase();
   // ------------------------------
 
-  // --- DEBUG ROUTE (Active Probe - RAW REST) ---
+  // --- DEBUG ROUTE (Active Probe - GROK) ---
   app.get('/api/debug-key', async (req, res) => {
     try {
-      // Use Global Fetch (Node 18+) OR Axios if available (safest fallback)
-      // Since we are debugging, let's use global fetch which Vercel supports
-      const key = process.env.AI_API_KEY || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
-      if (!key) return res.json({ status: 'error', message: 'No Key Found' });
+      const aiService = new AIService({ apiKey: process.env.GROK_API_KEY });
 
-      const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${key.trim()}`;
+      // Minimal test payload (1x1 transparent pixel) just to test auth
+      const testImage = {
+        data: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+        mimeType: "image/png"
+      };
 
-      // Use global fetch
-      const response = await fetch(url);
-      const data = await response.json();
+      // We'll try to score this dummy image
+      const score = await aiService.scoreWound(testImage);
 
       return res.json({
-        status: response.ok ? 'success' : 'failed',
-        statusCode: response.status,
-        keySuffix: key.slice(-4),
-        models: data.models ? data.models.map(m => m.name) : [],
-        error: data.error,
-        debugNote: "Using Raw REST API Check"
+        status: 'success',
+        provider: 'grok-xai',
+        score: score,
+        keySuffix: aiService.apiKey ? aiService.apiKey.slice(-4) : 'none',
+        note: "If this works, your Key and Backend are perfect."
       });
 
     } catch (error) {
       return res.json({
         status: 'failed',
+        provider: 'grok-xai',
         error: error.message,
-        stack: error.stack
+        stack: error.stack,
+        keySuffix: (process.env.GROK_API_KEY || "none").slice(-4),
+        tip: "If 401: Your 'vck' key might not work with api.x.ai directly.",
+        keyType: (process.env.GROK_API_KEY || "").startsWith('vck') ? "Vercel Key (vck)" : "Standard Key"
       });
     }
   });
