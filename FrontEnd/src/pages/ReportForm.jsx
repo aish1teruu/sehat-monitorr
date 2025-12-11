@@ -145,7 +145,17 @@ const ReportForm = () => {
         });
 
         // Asumsi backend mengembalikan { severity_score: 75 }
+        // SAFETY: Check response properties before access to prevent White Screen
+        if (!response || !response.data) {
+          throw new Error("Respon tidak valid dari server (Data kosong)");
+        }
+
         const score = response.data.severity_score;
+
+        if (score === undefined || score === null) {
+          throw new Error("Format respon server salah (severity_score hilang)");
+        }
+
         setWoundScore(score);
         setLoadingAi(false);
 
