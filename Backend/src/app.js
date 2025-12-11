@@ -24,9 +24,14 @@ function createApp() {
   db.initializeDatabase();
   // ------------------------------
 
-  // Serve static files from 'uploads' directory
-  // Assumes uploads is in the root of Backend (one level up from src)
-  app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+  // Serve static files
+  // In Vercel, files are in /tmp. locally in ../uploads
+  const uploadDir = process.env.VERCEL ? '/tmp' : path.join(__dirname, '../uploads');
+
+  // Mount at /api/uploads so it matches the URL structure we will use in frontend
+  app.use('/api/uploads', express.static(uploadDir));
+  // Also keep /uploads for backward compatibility/local if needed, but /api/uploads is safer for Vercel rewrites
+  app.use('/uploads', express.static(uploadDir));
 
   app.use(bodyParser({ limit: '10mb' }));
 

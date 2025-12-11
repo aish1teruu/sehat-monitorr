@@ -3,14 +3,20 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import groupImage from '../Asset/backgroundBerhasil.png';
 
-// Asumsi backend berjalan di port 3000
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3000';
+// Asumsi backend berjalan di port 3000 atau relative path /api
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '/api';
 
 const ReportBerhasil = () => {
   const [isExporting, setIsExporting] = useState(false);
   const [reportData, setReportData] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Helper untuk mengambil nama file dari path (membuang /tmp/ atau uploads/)
+  const getFilename = (path) => {
+    if (!path) return null;
+    return path.split(/[/\\]/).pop();
+  };
 
   // Ambil reportId dari state navigasi yang dikirim oleh ReportForm
   const reportId = location.state?.reportId;
@@ -37,13 +43,14 @@ const ReportBerhasil = () => {
       setIsExporting(true);
       // Navigasi ke FormDownload dengan data yang diambil dari backend
       // Kita perlu mapping key dari backend (snake_case) ke yang diharapkan FormDownload (camelCase/custom)
+
       const formDataForDownload = {
         nama: reportData.nama,
         lokasi: reportData.lokasi_puskesmas,
         deskripsi: reportData.deskripsi,
-        // Kirim URL gambar (string)
-        buktiPendukung: reportData.bukti_pendukung ? `${API_BASE_URL}/${reportData.bukti_pendukung.replace(/\\/g, '/')}` : null,
-        gambarLuka: reportData.unggah_gambar_luka ? `${API_BASE_URL}/${reportData.unggah_gambar_luka.replace(/\\/g, '/')}` : null,
+        // Kirim URL gambar yang benar: /api/uploads/<filename>
+        buktiPendukung: reportData.bukti_pendukung ? `${API_BASE_URL}/uploads/${getFilename(reportData.bukti_pendukung)}` : null,
+        gambarLuka: reportData.unggah_gambar_luka ? `${API_BASE_URL}/uploads/${getFilename(reportData.unggah_gambar_luka)}` : null,
         woundScore: reportData.wound_score
       };
 
