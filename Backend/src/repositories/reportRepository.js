@@ -37,7 +37,8 @@ class ReportRepository {
                 });
             } catch (err) {
                 console.error("Repository Error creating report:", err);
-                reject(new Error("Gagal menyimpan laporan ke database."));
+                // CRITICAL DEBUG: Show the real error message
+                reject(new Error(`DB ERROR: ${err.message}`));
             }
         });
     }
