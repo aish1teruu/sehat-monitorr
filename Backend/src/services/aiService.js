@@ -1,77 +1,90 @@
-const { createOpenAI } = require('@ai-sdk/openai');
-const { generateText } = require('ai');
-const { z } = require('zod');
-
 class AIService {
     constructor({ apiKey }) {
-        // Just store the constructor argument, don't read env yet
         this.fallbackKey = apiKey;
         console.log("DEBUG: AIService instantiated");
     }
 
     /**
-     * Helper to get the provider at runtime
+     * Helper to get the Key at runtime
      */
-    getProvider() {
-        // Runtime check for Env Vars (Safest for Vercel)
-        // Check ALL possible names including the old GEMINI one and standard OPENAI
+    getKey() {
         const key = this.fallbackKey ||
             process.env.GROK_API_KEY ||
             process.env.AI_API_KEY ||
             process.env.GEMINI_API_KEY ||
             process.env.OPENAI_API_KEY ||
             process.env.GOOGLE_API_KEY;
-
-        if (!key) {
-            console.error("CRITICAL: No API Key found in any known variable.");
-            return null;
-        }
-
-        return createOpenAI({
-            name: 'xai',
-            baseURL: 'https://api.x.ai/v1',
-            apiKey: key,
-        });
+        return key;
     }
 
     /**
-     * Menilai tingkat keparahan luka dari gambar Base64 menggunakan Grok.
+     * Menilai tingkat keparahan luka dari gambar Base64 menggunakan Grok via RAW FETCH.
      * @param {object} base64ImageData - Objek yang berisi { data: base64String, mimeType: string }
      * @returns {Promise<number|null>} Skor keparahan 0-100, atau null jika gagal.
      */
     async scoreWound(base64ImageData) {
         try {
-            console.log("DEBUG: Preparing request to Grok (xAI)...");
+            console.log("DEBUG: Preparing RAW request to Grok (xAI)...");
 
-            // Get Provider at Runtime (Lazy Init)
-            const grokProvider = this.getProvider();
-            if (!grokProvider) {
-                throw new Error("Missing API Key (Checked GROK_API_KEY, AI_API_KEY, GEMINI_API_KEY, OPENAI_API_KEY)");
+            const apiKey = this.getKey();
+            if (!apiKey) {
+                throw new Error("Missing API Key (Checked all env vars)");
             }
 
-            // Convert base64 to data URL format
+            // Construct standard OpenAI-compatible payload
             const dataUrl = `data:${base64ImageData.mimeType};base64,${base64ImageData.data}`;
 
-            // Use generateText for max compatibility (Structured Output is strict)
-            const result = await generateText({
-                model: grokProvider('grok-2-vision-1212'),
+            const payload = {
+                model: "grok-2-vision-1212",
                 messages: [
                     {
-                        role: 'user',
+                        role: "user",
                         content: [
-                            { type: 'text', text: "Analisis gambar luka ini. Berikan skor keparahan (severity_score) dalam rentang 0-100. IMPORTANT: Reply ONLY with JSON code block: ```json { \"severity_score\": number, \"reasoning\": string } ```" },
-                            { type: 'image', image: dataUrl }
+                            {
+                                type: "text",
+                                text: "Analisis gambar luka ini. Berikan skor keparahan (severity_score) dalam rentang 0-100. Jawab HANYA dengan JSON format: { \"severity_score\": number, \"reasoning\": string }"
+                            },
+                            {
+                                type: "image_url",
+                                image_url: {
+                                    url: dataUrl
+                                }
+                            }
                         ]
                     }
-                ]
+                ],
+                temperature: 0.1,
+                stream: false
+            };
+
+            // Execute Request
+            const response = await fetch("https://api.x.ai/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${apiKey}`
+                },
+                body: JSON.stringify(payload)
             });
 
-            console.log("DEBUG: Grok Raw Response:", result.text);
+            // Handle Non-200 Responses
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Grok API Error ${response.status}: ${errorText}`);
+            }
 
-            // Manual JSON Parsing (Robust fallback)
-            // Remove markdown code blocks if any
-            const cleanedText = result.text.replace(/```json/g, '').replace(/```/g, '').trim();
-            // Parse strictly
+            const data = await response.json();
+            console.log("DEBUG: Grok Raw Response:", JSON.stringify(data, null, 2));
+
+            // Extract Content
+            const content = data.choices && data.choices[0] && data.choices[0].message ? data.choices[0].message.content : "";
+
+            if (!content) {
+                throw new Error("Grok response body was empty or malformed");
+            }
+
+            // Manual JSON Parsing
+            const cleanedText = content.replace(/```json/g, '').replace(/```/g, '').trim();
             const jsonResult = JSON.parse(cleanedText);
 
             return jsonResult.severity_score;
@@ -79,11 +92,10 @@ class AIService {
         } catch (err) {
             console.error("Grok AI Error:", err.message);
 
-            // Safe Key Logging
-            const runtimeKey = process.env.GROK_API_KEY || process.env.AI_API_KEY || "undefined";
-            const suffix = runtimeKey.slice(-4);
+            const keyUsed = this.getKey() || "undefined";
+            const suffix = keyUsed.length > 4 ? keyUsed.slice(-4) : keyUsed;
 
-            throw new Error(`AI Service Failed (Grok): ${err.message}. Key Suffix: ${suffix}`);
+            throw new Error(`AI Service Failed (Grok Raw): ${err.message}. Key Suffix: ${suffix}`);
         }
     }
 }
