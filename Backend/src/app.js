@@ -25,16 +25,38 @@ function createApp() {
   db.initializeDatabase();
   // ------------------------------
 
-  // --- DEBUG ROUTE (USER REQUESTED) ---
-  app.get('/api/debug-key', (req, res) => {
-    const key = process.env.AI_API_KEY;
-    return res.json({
-      status: 'ok',
-      keyLength: key ? key.length : 0,
-      keyPrefix: key ? key.substring(0, 5) : 'undefined',
-      keySuffix: key ? key.slice(-4) : 'undefined',
-      env: process.env.VERCEL_ENV || 'local'
-    });
+  // --- DEBUG ROUTE (Active Probe) ---
+  app.get('/api/debug-key', async (req, res) => {
+    try {
+      const { GoogleGenerativeAI } = require("@google/generative-ai");
+      const key = process.env.AI_API_KEY || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+
+      if (!key) return res.json({ status: 'error', message: 'No Key Found' });
+
+      const genAI = new GoogleGenerativeAI(key.trim());
+      // Try standard model first
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+      const result = await model.generateContent("Hello Gemini, are you there?");
+      const response = await result.response;
+      const text = response.text();
+
+      return res.json({
+        status: 'success',
+        keySuffix: key.slice(-4),
+        model: "gemini-1.5-flash",
+        apiVersion: "default (v1beta)",
+        response: text
+      });
+
+    } catch (error) {
+      return res.json({
+        status: 'failed',
+        error: error.message,
+        stack: error.stack,
+        keySuffix: (process.env.AI_API_KEY || process.env.GEMINI_API_KEY || "none").slice(-4)
+      });
+    }
   });
   // ------------------------------------
 
