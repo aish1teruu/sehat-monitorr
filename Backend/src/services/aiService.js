@@ -1,5 +1,5 @@
 const { createOpenAI } = require('@ai-sdk/openai');
-const { generateObject } = require('ai');
+const { generateText } = require('ai');
 const { z } = require('zod');
 
 class AIService {
@@ -49,40 +49,39 @@ class AIService {
                 throw new Error("Missing API Key (Checked GROK_API_KEY, AI_API_KEY, GEMINI_API_KEY, OPENAI_API_KEY)");
             }
 
-            // Define the schema so Grok knows EXACTLY what to return
-            const schema = z.object({
-                severity_score: z.number().min(0).max(100).describe("Skala keparahan luka dari 0 (ringan) sampai 100 (sangat parah)"),
-                reasoning: z.string().describe("Alasan singkat penilaian (maks 1 kalimat)")
-            });
-
             // Convert base64 to data URL format
             const dataUrl = `data:${base64ImageData.mimeType};base64,${base64ImageData.data}`;
 
-            // Use the specific Vision model
-            const result = await generateObject({
+            // Use generateText for max compatibility (Structured Output is strict)
+            const result = await generateText({
                 model: grokProvider('grok-2-vision-1212'),
-                schema: schema,
-                // prompt property removed to fix conflict with messages
                 messages: [
                     {
                         role: 'user',
                         content: [
-                            { type: 'text', text: "Analisis gambar luka ini. Berikan skor keparahan (severity_score) dalam rentang 0-100." },
+                            { type: 'text', text: "Analisis gambar luka ini. Berikan skor keparahan (severity_score) dalam rentang 0-100. IMPORTANT: Reply ONLY with JSON code block: ```json { \"severity_score\": number, \"reasoning\": string } ```" },
                             { type: 'image', image: dataUrl }
                         ]
                     }
                 ]
             });
 
-            console.log("DEBUG: Grok Response:", result.object);
-            return result.object.severity_score;
+            console.log("DEBUG: Grok Raw Response:", result.text);
+
+            // Manual JSON Parsing (Robust fallback)
+            // Remove markdown code blocks if any
+            const cleanedText = result.text.replace(/```json/g, '').replace(/```/g, '').trim();
+            // Parse strictly
+            const jsonResult = JSON.parse(cleanedText);
+
+            return jsonResult.severity_score;
 
         } catch (err) {
             console.error("Grok AI Error:", err.message);
 
             // Safe Key Logging
-            const keyUsed = this.apiKey;
-            const suffix = keyUsed ? keyUsed.slice(-4) : "undefined";
+            const runtimeKey = process.env.GROK_API_KEY || process.env.AI_API_KEY || "undefined";
+            const suffix = runtimeKey.slice(-4);
 
             throw new Error(`AI Service Failed (Grok): ${err.message}. Key Suffix: ${suffix}`);
         }
