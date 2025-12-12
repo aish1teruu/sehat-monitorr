@@ -83,14 +83,14 @@ export default function Home() {
         <div className="container mx-auto relative z-10">
           <div className="flex flex-col lg:flex-row items-center gap-12">
             <div className="lg:w-1/2 space-y-6 relative z-20">
-              <h1 className="text-4xl md:text-5xl font-bold text-pink-200 leading-tight ml-6">
+              <h1 className="text-3xl md:text-5xl font-bold text-pink-200 leading-tight ml-0 md:ml-6 text-center md:text-left">
                 Awasi dan Tingkatkan Kualitas Penanganan Kesehatan di Indonesia
               </h1>
-              <p className="text-lg text-gray-200 ml-6">
+              <p className="text-base md:text-lg text-gray-200 ml-0 md:ml-6 text-center md:text-left">
                 Kesehatan yang baik berawal dari kepedulian kita bersama. Melalui Sehat Monitor, Anda dapat turut mengawasi dan melaporkan penanganan kesehatan agar lebih cepat, aman, dan berkualitas.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 pt-4 ml-6">
-                <Link to="/report-form" className="bg-pink-400 text-white font-bold py-3 px-6 rounded-full hover:bg-pink-500 transition-colors inline-block">
+              <div className="flex flex-col sm:flex-row gap-4 pt-4 ml-0 md:ml-6 justify-center md:justify-start">
+                <Link to="/report-form" className="bg-pink-400 text-white font-bold py-3 px-6 rounded-full hover:bg-pink-500 transition-colors text-center">
                   Mulai Pelaporan
                 </Link>
                 <button
@@ -98,7 +98,7 @@ export default function Home() {
                     e.preventDefault();
                     const element = document.getElementById('guide');
                     if (element) {
-                      const offsetTop = element.offsetTop - 100; // Mengurangi 100px dari posisi target
+                      const offsetTop = element.offsetTop - 100;
                       window.scrollTo({
                         top: offsetTop,
                         behavior: 'smooth'
@@ -113,43 +113,50 @@ export default function Home() {
             </div>
 
             <div className="lg:w-1/2 relative z-20">
-              <div className="relative">
+              <div className="relative flex justify-center items-center mt-10 lg:mt-0">
                 {/* Background ellipse behind main image - moved slightly to the right */}
                 <img
                   src={ellipseBackground}
                   alt="Background ellipse"
-                  className="rounded-lg mx-auto absolute"
-                  style={{ width: '700px', height: '800px', zIndex: 0, left: '15px', top: '-100px' }}
+                  className="rounded-lg absolute hidden md:block"
+                  style={{ width: '100%', maxWidth: '700px', height: 'auto', zIndex: 0, top: '-50px' }}
                 />
-                {/* Adding the logo behind the main image */}
-                <div className="absolute -top-0 -left-0 w-50 h-50 z-0 rotate-12">
+
+                <div className="relative w-full max-w-[400px]">
+                  {/* Adding the logo behind the main image */}
+                  <div className="absolute -top-10 -left-10 w-32 h-32 md:w-50 md:h-50 z-0 rotate-12 hidden md:block">
+                    <img
+                      src={logoWhite}
+                      alt="SETOR Logo"
+                      className="w-full h-full object-contain opacity-70 blur"
+                    />
+                  </div>
+
+                  {/* Main image */}
                   <img
-                    src={logoWhite}
-                    alt="SETOR Logo"
-                    className="w-full h-full object-contain opacity-70 blur"
+                    src={backgroundImage}
+                    alt="Person with bandaged arm"
+                    className="rounded-lg relative bg-opacity-0 mx-auto w-full h-auto z-10"
+
                   />
+
+                  <div className="absolute top-1/4 -right-4 md:right-[-20px] bg-black bg-opacity-40 p-2 md:p-4 rounded-lg z-20 text-center transform translate-x-1/2 md:translate-x-0">
+                    <div className="text-xs md:text-sm text-white mb-2 font-poppins">Powered by</div>
+                    <img
+                      src={group73Image}
+                      alt="Powered by"
+                      className="w-24 md:w-32 h-auto mx-auto"
+                    />
+                  </div>
+
+                  {/* Moving the "Jaminan laporan tersampaikan kepada pemerintah" text below the left side of the image and with black background */}
+                  <div className="absolute bottom-4 left-0 bg-black bg-opacity-40 p-2 md:p-4 rounded-lg max-w-[180px] md:max-w-[220px] z-20">
+                    <p className="text-sm md:text-lg text-white font-poppins ml-1">Jaminan laporan tersampaikan kepada pemerintah</p>
+                  </div>
                 </div>
-                {/* Main image */}
-                <img
-                  src={backgroundImage}
-                  alt="Person with bandaged arm"
-                  className="rounded-lg mx-auto relative bg-opacity-0 -mb-12"
-                  style={{ width: '400px', height: '610px', zIndex: 10, top: '20px' }}
-                />
-                <div className="absolute top-48 right-12 bg-black bg-opacity-40 p-4 rounded-lg z-20 text-center">
-                  <div className="text-s text-white mb-2 font-poppins">Powered by</div>
-                  <img
-                    src={group73Image}
-                    alt="Powered by"
-                    className="w-32 h-12 mx-auto"
-                  />
-                </div>
-                {/* Moving the "Jaminan laporan tersampaikan kepada pemerintah" text below the left side of the image and with black background */}
-                <div className="absolute bottom-0 left-0 bg-black bg-opacity-40 p-4 rounded-lg max-w-[220px] z-20">
-                  <p className="text-l text-white font-poppins ml-1">Jaminan laporan tersampaikan kepada pemerintah</p>
-                </div>
+
                 {/* Moving the other logo to the bottom right */}
-                <div className="absolute -bottom-0 -right-0 w-50 h-50 z-0 rotate-12">
+                <div className="absolute -bottom-10 -right-10 w-32 h-32 md:w-50 md:h-50 z-0 rotate-12 hidden md:block">
                   <img
                     src={logoWhite}
                     alt="SETOR Logo"
@@ -170,7 +177,7 @@ export default function Home() {
             <img
               src={ellipse26Image}
               alt="Ellipse 26"
-              className="w-[1400px] h-[700px] opacity-100 z-0"
+              className="w-[1400px] h-[700px] opacity-100 z-0 hidden md:block" // Hidden on mobile
             />
           </div>
 
@@ -200,16 +207,16 @@ export default function Home() {
       {/* Quote Section */}
       <section id="contact" className="py-16 px-6 bg-[#255F3B]">
         <div className="container mx-auto relative">
-          {/* Logo di kiri atas */}
-          <div className="absolute top-20 -left-4 w-45 h-45 z-0 opacity-70 -rotate-12 blur">
+          {/* Logo di kiri atas - Hidden on mobile */}
+          <div className="absolute top-20 -left-4 w-45 h-45 z-0 opacity-70 -rotate-12 blur hidden md:block">
             <img
               src={logoWhite}
               alt="SETOR Logo"
               className="w-full h-full object-contain"
             />
           </div>
-          {/* Logo di kanan bawah */}
-          <div className="absolute bottom-4 left-96 w-50 h-50 z-0 opacity-70 rotate-12 blur">
+          {/* Logo di kanan bawah - Hidden on mobile */}
+          <div className="absolute bottom-4 left-96 w-50 h-50 z-0 opacity-70 rotate-12 blur hidden md:block">
             <img
               src={logoWhite}
               alt="SETOR Logo"
@@ -217,8 +224,8 @@ export default function Home() {
             />
           </div>
 
-          {/* WhatsApp icon di kanan atas */}
-          <div className="absolute top-20 right-24 z-10">
+          {/* WhatsApp icon di kanan atas - Hidden on mobile */}
+          <div className="absolute top-20 right-24 z-10 hidden md:block">
             <img
               src={whatsappIcon}
               alt="WhatsApp"
@@ -227,8 +234,8 @@ export default function Home() {
           </div>
 
 
-          {/* Instagram icon di kanan bawah */}
-          <div className="absolute -bottom-14 -right-4 z-10 -rotate-12">
+          {/* Instagram icon di kanan bawah - Hidden on mobile */}
+          <div className="absolute -bottom-14 -right-4 z-10 -rotate-12 hidden md:block">
             <img
               src={instagramIcon}
               alt="Instagram"
@@ -236,8 +243,8 @@ export default function Home() {
             />
           </div>
 
-          {/* Ellipse 1 image di kiri bawah */}
-          <div className="absolute -top-0 -left-30 opacity-100 z-0">
+          {/* Ellipse 1 image di kiri bawah - Hidden on mobile */}
+          <div className="absolute -top-0 -left-30 opacity-100 z-0 hidden md:block">
             <img
               src={ellipseBackground}
               alt="Ellipse 1"
@@ -247,14 +254,14 @@ export default function Home() {
           </div>
 
           <div className="text-left relative z-30">
-            <div className="mb-12">
+            <div className="mb-12 text-center md:text-left">
               <div className="text-3xl md:text-5xl" style={{ fontFamily: "'La Belle Aurore', cursive" }}>
                 <span className="text-white">"Karena</span>
                 <span className="text-white"> Setiap</span>
                 <span style={{ color: '#FFD0EE' }}> Laporan</span>
                 <span className="text-white"> anda</span>
               </div>
-              <div className="text-3xl md:text-5xl ml-32 mt-4" style={{ fontFamily: "'La Belle Aurore', cursive" }}>
+              <div className="text-3xl md:text-5xl md:ml-32 mt-4" style={{ fontFamily: "'La Belle Aurore', cursive" }}>
                 <span className="z-30" style={{ color: '#FFD0EE' }}>Bermanfaat</span>
                 <span className="text-white"> Bagi</span>
                 <span className="text-white"> Sesama"</span>
@@ -270,7 +277,7 @@ export default function Home() {
                 />
               </div>
 
-              <div className="md:w-1/2 ml-16">
+              <div className="md:w-1/2 ml-0 md:ml-16">
                 <h3 className="text-5xl font-bold text-pink-200 text-left mb-8">Contact Us</h3>
                 <div className="space-y-4 pl-1">
                   <div className="flex items-center gap-3">

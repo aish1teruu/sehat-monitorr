@@ -197,7 +197,7 @@ const ReportForm = () => {
             <span className="text-pink-300">Laporkan</span> Keluhan Anda!
           </h1>
 
-          <div className="max-w-4xl mx-auto bg-green-50 rounded-xl p-8 shadow-lg">
+          <div className="max-w-4xl mx-auto bg-green-50 rounded-xl p-4 md:p-8 shadow-lg">
 
             {/* Area Error dan Loading Global */}
             {(submissionError || loadingAi || isSubmitting) && (
