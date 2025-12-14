@@ -193,11 +193,11 @@ const ReportForm = () => {
       {/* Main Content */}
       <main className="py-12 px-6">
         <div className="container mx-auto relative z-10">
-          <h1 className="text-3xl md:text-4xl font-bold text-white text-center mb-8">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white text-center mb-8">
             <span className="text-pink-300">Laporkan</span> Keluhan Anda!
           </h1>
 
-          <div className="max-w-4xl mx-auto bg-green-50 rounded-xl p-4 md:p-8 shadow-lg">
+          <div className="max-w-xs sm:max-w-sm md:max-w-xl lg:max-w-4xl mx-auto bg-green-50 rounded-xl p-4 md:p-8 shadow-lg">
 
             {/* Area Error dan Loading Global */}
             {(submissionError || loadingAi || isSubmitting) && (
@@ -210,9 +210,9 @@ const ReportForm = () => {
             )}
 
             <form onSubmit={handleSubmit} noValidate>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 gap-6 sm:gap-8">
 
-                {/* Left Column (Input Data Pelapor) */}
+                {/* Input Data Pelapor (Mobile: Full Width) */}
                 <div className="space-y-6">
                   <div>
                     <label className="block text-green-900 font-semibold mb-2">Nama</label>
@@ -266,7 +266,7 @@ const ReportForm = () => {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-green-900 font-semibold mb-2">Tanggal</label>
                       <div className="relative">
@@ -285,7 +285,7 @@ const ReportForm = () => {
 
                     <div>
                       <label className="block text-green-900 font-semibold mb-2">Gender</label>
-                      <div className="flex items-center space-x-4 pt-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 pt-3">
                         <label className="flex items-center">
                           <input
                             type="radio"
@@ -315,19 +315,19 @@ const ReportForm = () => {
                   </div>
                 </div>
 
-                {/* Right Column (Upload dan Deskripsi) */}
+                {/* Upload dan Deskripsi (Mobile: Full Width) */}
                 <div className="space-y-6">
 
                   {/* Unggah Gambar Luka (AI Scoring) */}
                   <div>
                     <label className="block text-green-900 font-semibold mb-2">Unggah Gambar Luka</label>
-                    <div className="border-2 border-green-700 rounded-lg p-4 bg-white">
+                    <div className="border-2 border-green-700 rounded-lg p-3 sm:p-4 bg-white">
                       <input
                         type="file"
                         name="gambarLuka" // Digunakan untuk menyimpan file di state
                         onChange={handleFileChange} // Diubah ke handleFileChange
                         accept="image/*"
-                        className="w-full text-green-700"
+                        className="w-full text-green-700 text-sm"
                       />
                       <div className="mt-2 text-xs text-green-700">
                         Pastikan area luka/penanganan terlihat dengan baik
@@ -336,11 +336,11 @@ const ReportForm = () => {
                       {/* Tampilkan Skor AI dan Loading */}
                       {(loadingAi || woundScore !== null) && (
                         <div className="mt-4 p-3 rounded-lg border border-pink-300 bg-pink-50 text-center">
-                          {loadingAi && <p className="font-semibold text-pink-500">Menganalisis...</p>}
+                          {loadingAi && <p className="font-semibold text-pink-500 text-sm">Menganalisis...</p>}
                           {woundScore !== null && !loadingAi && (
                             <div>
                               <p className="text-sm text-green-900">Skor Keparahan AI:</p>
-                              <span className={`text-2xl font-bold ${getScoreColor(woundScore)}`}>
+                              <span className={`text-xl sm:text-2xl font-bold ${getScoreColor(woundScore)}`}>
                                 {woundScore === "Error" ? 'Gagal' : `${woundScore}/100`}
                               </span>
                             </div>
@@ -353,12 +353,12 @@ const ReportForm = () => {
                   {/* Bukti Pendukung */}
                   <div>
                     <label className="block text-green-900 font-semibold mb-2">Bukti Pendukung</label>
-                    <div className="border-2 border-green-700 rounded-lg p-4 bg-white">
+                    <div className="border-2 border-green-700 rounded-lg p-3 sm:p-4 bg-white">
                       <input
                         type="file"
                         name="buktiPendukung" // Digunakan untuk menyimpan file di state
                         onChange={handleFileChange} // Diubah ke handleFileChange
-                        className="w-full text-green-700"
+                        className="w-full text-green-700 text-sm"
                         required
                       />
                       <div className="mt-2 text-xs text-green-700">
@@ -381,20 +381,22 @@ const ReportForm = () => {
                     ></textarea>
                   </div>
                 </div>
+
+                {/* Tombol Submit (akan selalu ada di bawah) */}
+                <div className="mt-6 text-center">
+                  <button
+                    type="submit"
+                    disabled={isSubmitting || loadingAi}
+                    className={`px-6 py-2 sm:px-8 sm:py-3 rounded-full font-bold ${isSubmitting || loadingAi
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : 'bg-pink-300 text-white hover:bg-pink-400'
+                      } transition-colors text-base sm:text-lg`}
+                  >
+                    {isSubmitting ? 'Mengirim...' : 'Kirim'}
+                  </button>
+                </div>
               </div>
 
-              <div className="mt-8 text-center">
-                <button
-                  type="submit"
-                  disabled={isSubmitting || loadingAi}
-                  className={`px-8 py-3 rounded-full font-bold text-lg ${isSubmitting || loadingAi
-                    ? 'bg-gray-400 cursor-not-allowed'
-                    : 'bg-pink-300 text-white hover:bg-pink-400'
-                    } transition-colors`}
-                >
-                  {isSubmitting ? 'Mengirim...' : 'Kirim'}
-                </button>
-              </div>
             </form>
           </div>
         </div>

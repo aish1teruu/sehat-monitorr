@@ -49,62 +49,62 @@ const FormDownload = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-900 to-green-800 text-white font-sans relative overflow-hidden">
 
-      <div ref={exportRef} className="relative z-0 max-w-md mx-auto min-h-screen bg-[#1A472B] rounded-2xl mt-10">
+      <div ref={exportRef} className="relative z-0 max-w-xs sm:max-w-sm md:max-w-md mx-auto min-h-screen bg-[#1A472B] rounded-2xl mt-6 sm:mt-10">
         <img
           src={elemenBackground}
           alt="background element"
           className="absolute top-0 left-0 w-full h-full object-cover opacity-30 -z-10 pointer-events-none"
         />
         {/* HEADER */}
-        <header className="py-6 px-4 text-center z-10">
-          <div className="mt-10 mb-10 flex flex-col items-center gap-2">
-            <img src={pelanggaranLayanan} alt="header form" className="w-full max-w-sm object-contain" />
+        <header className="py-4 sm:py-6 px-4 text-center z-10">
+          <div className="mt-6 sm:mt-10 mb-6 sm:mb-10 flex flex-col items-center gap-2">
+            <img src={pelanggaranLayanan} alt="header form" className="w-full max-w-[200px] sm:max-w-sm object-contain" />
           </div>
         </header>
 
         {/* MAIN CONTENT */}
-        <main className="container mx-auto px-4 py-8">
-          <div className="max-w-3xl mx-auto">
-            <div className="relative z-[5] bg-neutral-900 bg-opacity-60 rounded-3xl p-6 md:p-8 shadow-xl z-10">
+        <main className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
+          <div className="max-w-xs sm:max-w-sm md:max-w-3xl mx-auto">
+            <div className="relative z-[5] bg-neutral-900 bg-opacity-60 rounded-3xl p-4 sm:p-6 md:p-8 shadow-xl z-10">
 
               {/* NAME */}
-              <div className="mb-6">
-                <p className="text-pink-300 text-sm">Halo! nama saya</p>
-                <h3 className="text-2xl font-bold text-white border-b-2 border-white pb-2 mt-1">
+              <div className="mb-4 sm:mb-6">
+                <p className="text-pink-300 text-xs sm:text-sm">Halo! nama saya</p>
+                <h3 className="text-xl sm:text-2xl font-bold text-white border-b-2 border-white pb-2 mt-1">
                   {reportData.name}
                 </h3>
               </div>
 
               {/* FACILITY */}
-              <div className="mb-6">
-                <p className="text-pink-300 text-sm">
+              <div className="mb-4 sm:mb-6">
+                <p className="text-pink-300 text-xs sm:text-sm">
                   Saya mendapatkan pelayanan kesehatan yang buruk di
                 </p>
-                <h4 className="text-xl font-bold text-white border-b-2 border-white pb-2 mt-1">
+                <h4 className="text-lg sm:text-xl font-bold text-white border-b-2 border-white pb-2 mt-1">
                   {reportData.facility}
                 </h4>
               </div>
 
               {/* WOUND SCORE */}
               {reportData.woundScore && (
-                <div className="mb-6">
-                  <p className="text-pink-300 text-sm">
+                <div className="mb-4 sm:mb-6">
+                  <p className="text-pink-300 text-xs sm:text-sm">
                     Tingkat keparahan luka (Wound Score)
                   </p>
-                  <h4 className="text-xl font-bold text-white border-b-2 border-white pb-2 mt-1">
+                  <h4 className="text-lg sm:text-xl font-bold text-white border-b-2 border-white pb-2 mt-1">
                     {reportData.woundScore}
                   </h4>
                 </div>
               )}
 
               {/* IMAGES */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div className="grid grid-cols-1 gap-4 sm:gap-6 mb-4 sm:mb-6">
                 <div className="rounded-lg overflow-hidden">
                   <img
                     src={reportData.evidenceImage}
                     alt="Bukti Pendukung"
                     crossOrigin="anonymous"
-                    className="w-full h-48 object-cover"
+                    className="w-full h-32 sm:h-40 md:h-48 object-cover"
                   />
                 </div>
 
@@ -114,7 +114,7 @@ const FormDownload = () => {
                       src={reportData.woundImage}
                       alt="Foto Luka"
                       crossOrigin="anonymous"
-                      className="w-full h-48 object-cover"
+                      className="w-full h-32 sm:h-40 md:h-48 object-cover"
                     />
                   </div>
                 )}
@@ -122,8 +122,8 @@ const FormDownload = () => {
 
               {/* WOUND SCORE BELOW IMAGES */}
               {reportData.woundScore && (
-                <div className="text-center mb-4">
-                  <h4 className="text-white text-lg">
+                <div className="text-center mb-3 sm:mb-4">
+                  <h4 className="text-white text-base sm:text-lg">
                     Woundscore: {reportData.woundScore}/100
                   </h4>
                 </div>
@@ -131,8 +131,8 @@ const FormDownload = () => {
 
               {/* DESCRIPTION */}
               <div>
-                <h5 className="text-pink-300 text-sm mb-2">Deskripsi</h5>
-                <p className="text-white leading-relaxed">
+                <h5 className="text-pink-300 text-xs sm:text-sm mb-2">Deskripsi</h5>
+                <p className="text-white leading-relaxed text-sm sm:text-base">
                   {reportData.description}
                 </p>
               </div>
@@ -140,8 +140,8 @@ const FormDownload = () => {
           </div>
         </main>
 
-        <footer className="py-6 px-4 text-center z-10">
-          <p className="text-pink-300 text-sm">
+        <footer className="py-4 sm:py-6 px-3 sm:px-4 text-center z-10">
+          <p className="text-pink-300 text-xs sm:text-sm">
             reported via <span className="underline">www.sehatmonitor.xyz</span>
           </p>
         </footer>
@@ -150,10 +150,10 @@ const FormDownload = () => {
       </div>
 
       {/* DOWNLOAD BUTTON */}
-      <div className="text-center mt-8 mb-8">
+      <div className="text-center mt-6 sm:mt-8 mb-6 sm:mb-8 px-4">
         <button
           onClick={handleDownload}
-          className="bg-pink-400 text-white px-6 py-3 rounded-full font-semibold hover:bg-pink-500 transition"
+          className="bg-pink-400 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full font-semibold hover:bg-pink-500 transition text-sm sm:text-base"
         >
           Download Image
         </button>

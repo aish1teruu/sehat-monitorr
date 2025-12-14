@@ -74,58 +74,60 @@ const ReportBerhasil = () => {
       {/* Main Content */}
       <main className="py-12 px-6 relative z-20">
         <div className="container mx-auto">
-          <h1 className="text-3xl md:text-4xl text-white font-bold text-center mb-8">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl text-white font-bold text-center mb-8">
             <span className="text-pink-300">Terima Kasih</span> telah menggunakan <span className="text-pink-300">SETOR</span>
           </h1>
 
-          <div className="max-w-md mx-auto bg-green-50 rounded-xl p-8 shadow-lg">
+          <div className="max-w-xs sm:max-w-sm md:max-w-md mx-auto bg-green-50 rounded-xl p-6 sm:p-8 shadow-lg">
             <div className="text-center">
-              <div className="mb-6">
-                <div className="inline-flex items-center justify-center w-24 h-24 bg-green-500 rounded-full">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="mb-4 sm:mb-6">
+                <div className="inline-flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 bg-green-500 rounded-full">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 sm:h-12 sm:w-12 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
               </div>
 
-              <h2 className="text-2xl font-bold text-green-900 mb-4">
+              <h2 className="text-xl sm:text-2xl font-bold text-green-900 mb-4">
                 Laporan berhasil dikirim!
               </h2>
 
               {/* Tampilkan ID Laporan */}
-              <p className="text-green-800 mb-2 font-semibold">
+              <p className="text-green-800 mb-2 font-semibold text-sm sm:text-base">
                 ID Laporan Anda:
               </p>
-              <p className="text-2xl font-extrabold text-pink-500 mb-6">
+              <p className="text-xl sm:text-2xl font-extrabold text-pink-500 mb-4 sm:mb-6">
                 {reportIdDisplay}
               </p>
 
-              <p className="text-green-800 mb-6">
+              <p className="text-green-800 mb-4 sm:mb-6 text-sm sm:text-base">
                 Kami akan mengirimkan email kepada anda untuk status verifikasi dan informasi selanjutnya.
               </p>
 
               {/* Tombol Unduh Laporan (Navigasi ke FormDownload) */}
-              <button
-                onClick={handleExport}
-                disabled={isExporting || !reportData}
-                className={`inline-block px-6 py-3 rounded-full font-semibold ${isExporting || !reportData
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-pink-300 text-green-900 hover:bg-pink-400'
-                  } transition-colors mb-4`}
-              >
-                {isExporting ? 'Mempersiapkan...' : '⬇ Export Image'}
-              </button>
+              <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-4 mb-4">
+                <button
+                  onClick={handleExport}
+                  disabled={isExporting || !reportData}
+                  className={`px-4 sm:px-6 py-2 sm:py-3 rounded-full font-semibold ${isExporting || !reportData
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-pink-300 text-green-900 hover:bg-pink-400'
+                    } transition-colors`}
+                >
+                  {isExporting ? 'Mempersiapkan...' : '⬇ Export Image'}
+                </button>
 
-              {/* Tombol Share */}
-              <button
-                disabled={!reportId}
-                className={`inline-block px-6 py-3 rounded-full font-semibold ${!reportId ? 'bg-gray-400 cursor-not-allowed' : 'bg-pink-300 text-green-900 hover:bg-pink-400'
-                  } transition-colors mb-4 ml-2`}
-              >
-                🔗 Share Laporan
-              </button>
+                {/* Tombol Share */}
+                <button
+                  disabled={!reportId}
+                  className={`px-4 sm:px-6 py-2 sm:py-3 rounded-full font-semibold ${!reportId ? 'bg-gray-400 cursor-not-allowed' : 'bg-pink-300 text-green-900 hover:bg-pink-400'
+                    } transition-colors`}
+                >
+                  🔗 Share Laporan
+                </button>
+              </div>
 
-              <p className="text-sm text-green-700">
+              <p className="text-xs sm:text-sm text-green-700">
                 Bagikan laporan Anda ke media sosial untuk meningkatkan kesadaran publik.
               </p>
             </div>
